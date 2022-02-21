@@ -48,5 +48,14 @@ int main(int argc, char **argv)
     Uint32 full_padded_size = padded_row_size * image_size[1];
     SDL_Log("the bmp padded pixel data size is %llu", full_padded_size);
 
+    //TODO
+    for(Uint32 y=0 ; y < image_size[0] ; y++)
+    {
+        Uint8 *texture_row; //compute the address of the texture row
+        Uint8 *bitmap_row; //compute the adress of row of the bitmap (they are inverted)
+        SDL_memcpy(texture_row, bitmap_row, row_size);
+        
+    }
+
     return 0;
 }
