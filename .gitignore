@@ -51,5 +51,7 @@ Module.symvers
 Mkfile.old
 dkms.conf
 
-#custom
+#customs
+.vs/
 *.bat
+SDL2-2.0.20/
