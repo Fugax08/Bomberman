@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include "parse_bmp.h"
 
 int main(int argc, char **argv)
 {

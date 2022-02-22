@@ -4,6 +4,10 @@ int bmp_parser(Uint8* content, SDL_Renderer* renderer, SDL_Texture** texture)
 {
 	Uint8 alignment = 4;
     Uint8 channels = 3;
+	
+	Uint32 width, height;
+	SDL_memcpy(&width, content + 18, 4);
+	SDL_memcpy(&height, content + 22, 4);
 
 	*texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_BGR24, SDL_TEXTUREACCESS_STATIC, width, height);
 	if (!*texture)
@@ -17,10 +21,6 @@ int bmp_parser(Uint8* content, SDL_Renderer* renderer, SDL_Texture** texture)
 	}
 
 	Uint8* pixelsHead = content + (*(content + 10));
-	
-	Uint32 width, height;
-	SDL_memcpy(&width, content + 18, 4);
-	SDL_memcpy(&height, content + 22, 4);
 
 	Uint32 rowSize = width * channels;
 	Uint32 paddedRowSize = (rowSize / alignment) * alignment;
