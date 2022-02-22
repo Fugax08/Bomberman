@@ -31,7 +31,7 @@ int bmp_parser(Uint8* content, SDL_Renderer* renderer, SDL_Texture** texture)
 
 
 	Uint32 x = 0;
-	for (Uint32 y = height - 1; y > -1; y--)
+	for (Uint32 y = height - 1; y > -1; --y)
 	{
 		SDL_memcpy(pixels + x * rowSize, pixelsHead + y * paddedRowSize, rowSize);
 		++x;

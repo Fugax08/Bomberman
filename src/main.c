@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <stdio.h>
 #include "parse_bmp.h"
 
 int main(int argc, char **argv)
@@ -9,7 +10,7 @@ int main(int argc, char **argv)
         return 1;
     }
 
-    SDL_Window* window = SDL_CreateWindow ("SDL is active!" , 100, 100, 512, 512, 0);
+    SDL_Window* window = SDL_CreateWindow ("SDL is active!" , 100, 100, 1024, 1024, 0);
     if (!window)
     {
         SDL_Log("Unable to create window: %s", SDL_GetError());
@@ -35,7 +36,7 @@ int main(int argc, char **argv)
         SDL_Log("Unable to alloctae texture moemory: %s", SDL_GetError());
         goto quit;
     }
-    for(int y=0; y<128; y++)
+    /*for(int y=0; y<128; y++)
     {
         for(int x=0; x<128; x++)
         {
@@ -48,7 +49,26 @@ int main(int argc, char **argv)
 
     }
     SDL_Rect full = {0, 0, 128, 128};
-    SDL_UpdateTexture (texture, &full , pixels, 128 * 4);
+    SDL_UpdateTexture (texture, &full , pixels, 128 * 4);*/
+
+    const char* fileName = "Capture.bmp";
+	SDL_RWops* rw = SDL_RWFromFile(fileName, "rb");
+	if (!rw)
+	{
+		return -1;
+	}
+
+	Sint64 file_size = SDL_RWsize(rw);
+	char *content = (char*)SDL_malloc(file_size);
+	if (!content)
+	{
+		SDL_RWclose(rw);
+		return -1;
+	}
+
+	SDL_RWread(rw, content, file_size, 1);
+	SDL_RWclose(rw);
+    bmp_parser(content, renderer, &texture);
 
     SDL_SetTextureAlphaMod (texture, 255);
     SDL_SetTextureBlendMode (texture, SDL_BLENDMODE_BLEND );
