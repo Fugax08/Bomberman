@@ -4,6 +4,19 @@
 
 int main(int argc, char **argv)
 {
+    level_t level001;
+    int32_t level001_cells[] = {
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0
+    };
+
+    level_init(&level001, 8, 8, 64, level001_cells);
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
     {
         SDL_Log("Unable to initialize SDL: %s", SDL_GetError());
@@ -36,20 +49,6 @@ int main(int argc, char **argv)
         SDL_Log("Unable to alloctae texture moemory: %s", SDL_GetError());
         goto quit;
     }
-    /*for(int y=0; y<128; y++)
-    {
-        for(int x=0; x<128; x++)
-        {
-            size_t offset = y * 128 + x;
-            pixels[offset] = 0xFF000000;
-            pixels[offset] |= (rand() % 256) << 16; 
-            pixels[offset] |= (rand() % 256) << 8;
-            pixels[offset] |= (rand() % 256);  
-        }
-
-    }
-    SDL_Rect full = {0, 0, 128, 128};
-    SDL_UpdateTexture (texture, &full , pixels, 128 * 4);*/
 
     const char* fileName = "Capture.bmp";
 	SDL_RWops* rw = SDL_RWFromFile(fileName, "rb");
@@ -73,6 +72,8 @@ int main(int argc, char **argv)
     SDL_SetTextureAlphaMod (texture, 255);
     SDL_SetTextureBlendMode (texture, SDL_BLENDMODE_BLEND );
 
+    SDL_rect cell_rect = {0, 0, level001.cell_size, level001.cell_size}; 
+
     int running = 1;
     int x=0;
     while (running )
@@ -85,27 +86,25 @@ int main(int argc, char **argv)
                 running = 0;
             }
         }
-        SDL_SetRenderDrawBlendMode (renderer , SDL_BLENDMODE_NONE );
-        SDL_SetRenderDrawColor (renderer , 100, 0, 0, 255);
+
+        SDL_SetRenderDrawColor (renderer , 0, 0, 0, 0);
         SDL_RenderClear (renderer );
 
-        SDL_SetRenderDrawColor (renderer , 255, 255, 255, 255);
-        SDL_Rect rect = {x, 100, 300, 300};
-        SDL_RenderDrawRect (renderer , &rect);
-
-        SDL_SetRenderDrawBlendMode (renderer , SDL_BLENDMODE_BLEND );
-        SDL_SetRenderDrawColor (renderer , 255, 0, 255, 255);
-        rect.x = 20;
-        rect.y = 120;
-        rect.w=200;
-        rect.h =200;
-        SDL_RenderFillRect(renderer, &rect);
-        x++;
-
-        SDL_Rect source = {0, 0, 128, 128};
-        SDL_Rect target = {400, 400, 128, 128};
-        SDL_RenderCopy (renderer, texture, &source , &target );
-
+        for(uint32_t row = 0; row < level001.rows ;row++)
+        {
+            for(uint32_t col = 0; col < level001.cols ;col++)
+            {
+                int32_t cell = level_cell(&level001, col, row);
+                int32_t cell_texture = cell & 0xff;
+                if(cell_texture == BLOCK_GROUND)
+                {
+                    SDL_SetRenderDrawColor (renderer , 0, 255, 0, 255);
+                    cell_rect.x = col * level001.cell_size;
+                    cell_rect.y = row * level001.cell_size;
+                    SDL_RenderFillRect(renderer, &cell_rect);
+                }
+            }
+        }
         SDL_RenderPresent (renderer);
     }
 
