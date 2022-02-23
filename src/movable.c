@@ -15,8 +15,31 @@ int32_t move_on_level(level_t *level, movable_t *movable, const float delta_x, c
     else if(new_y + movable->height >= level->rows * level->cell_size)
         new_y = (level->rows * level->cell_size) - movable->height;
 
-    movable->x=new_x;
-    movable->y=new_y;
+    int32_t cell = -1;
+    // moving right ?
+    if (new_x > movable->x)
+    {
+        uint32_t cell_x = (new_x + movable->width - 1) / level->cell_size; // cell on which the movable will end
+        uint32_t cell_y = (movable->y + movable->height - 1) / level->cell_size; // test for feet
+        cell = level_cell(level, cell_x, cell_y);
+        if (cell & BLOCK_MASK_UNWALKABLE) // collision!
+        {
+            movable->x = cell_x * level->cell_size - movable->width; // bring back
+        }
+        else
+        {
+            cell_y = movable->y / level->cell_size; // test for neck
+            cell = level_cell(level, cell_x, cell_y);
+            if (cell & BLOCK_MASK_UNWALKABLE) // collision!
+            {
+                movable->x = cell_x * level->cell_size - movable->width; // bring back
+            }
+            else
+            {
+                movable->x = new_x;
+            }
+        }
+    }
 
     return -1;
     
