@@ -40,6 +40,78 @@ int32_t move_on_level(level_t *level, movable_t *movable, const float delta_x, c
             }
         }
     }
+    // moving left
+    if (new_x < movable->x)
+    {
+        uint32_t cell_x = (new_x + movable->width - 1) / level->cell_size; // cell on which the movable will end
+        uint32_t cell_y = (movable->y + movable->height - 1) / level->cell_size; // test for feet
+        cell = level_cell(level, cell_x, cell_y);
+        if (cell & BLOCK_MASK_UNWALKABLE) // collision!
+        {
+            movable->x = cell_x * level->cell_size + movable->width; // bring back
+        }
+        else
+        {
+            cell_y = movable->y / level->cell_size; // test for neck
+            cell = level_cell(level, cell_x, cell_y);
+            if (cell & BLOCK_MASK_UNWALKABLE) // collision!
+            {
+                movable->x = cell_x * level->cell_size + movable->width; // bring back
+            }
+            else
+            {
+                movable->x = new_x;
+            }
+        }
+    }
+    //moving down
+    if (new_y > movable->y)
+    {
+        uint32_t cell_y = (new_y + movable->height - 1) / level->cell_size; // cell on which the movable will end
+        uint32_t cell_x = (movable->x + movable->width - 1) / level->cell_size; // test for feet
+        cell = level_cell(level, cell_x, cell_y);
+        if (cell & BLOCK_MASK_UNWALKABLE) // collision!
+        {
+            movable->y = cell_y * level->cell_size - movable->height; // bring back
+        }
+        else
+        {
+            cell_x = movable->x / level->cell_size; // test for neck
+            cell = level_cell(level, cell_x, cell_y);
+            if (cell & BLOCK_MASK_UNWALKABLE) // collision!
+            {
+                movable->y = cell_y * level->cell_size - movable->height; // bring back
+            }
+            else
+            {
+                movable->y = new_y;
+            }
+        }
+    }
+    //moving up
+    if (new_y < movable->y)
+    {
+        uint32_t cell_y = (new_y + movable->height - 1) / level->cell_size; // cell on which the movable will end
+        uint32_t cell_x = (movable->x + movable->width - 1) / level->cell_size; // test for feet
+        cell = level_cell(level, cell_x, cell_y);
+        if (cell & BLOCK_MASK_UNWALKABLE) // collision!
+        {
+            movable->y = cell_y * level->cell_size + movable->height; // bring back
+        }
+        else
+        {
+            cell_x = movable->x / level->cell_size; // test for neck
+            cell = level_cell(level, cell_x, cell_y);
+            if (cell & BLOCK_MASK_UNWALKABLE) // collision!
+            {
+                movable->y = cell_y * level->cell_size + movable->height; // bring back
+            }
+            else
+            {
+                movable->y = new_y;
+            }
+        }
+    }
 
     return -1;
     

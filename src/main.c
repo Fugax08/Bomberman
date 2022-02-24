@@ -41,31 +41,17 @@ int main(int argc, char **argv)
         goto quit;
     }
 
-    unsigned int *pixels = SDL_malloc(128 * 128 * 4);
+    /*unsigned int *pixels = SDL_malloc(128 * 128 * 4);
     if(!pixels)
     {
         SDL_Log("Unable to alloctae texture moemory: %s", SDL_GetError());
         goto quit;
-    }
+    }*/
 
     const char* fileName = "Capture.bmp";
-	SDL_RWops* rw = SDL_RWFromFile(fileName, "rb");
-	if (!rw)
-	{
-		return -1;
-	}
-
-	Sint64 file_size = SDL_RWsize(rw);
-	char *content = (char*)SDL_malloc(file_size);
-	if (!content)
-	{
-		SDL_RWclose(rw);
-		return -1;
-	}
-
-	SDL_RWread(rw, content, file_size, 1);
-	SDL_RWclose(rw);
-    bmp_parser(content, renderer, &texture);
+    char* content;
+    bmp_open_file(fileName, &content);
+    bmp_parser_to_texture(content, renderer, &texture);
 
     SDL_SetTextureAlphaMod (texture, 255);
     SDL_SetTextureBlendMode (texture, SDL_BLENDMODE_BLEND );
@@ -153,8 +139,9 @@ int main(int argc, char **argv)
                 }
                 else if(cell_texture == BLOCK_DESTROYABLE)
                 {
-                    SDL_SetRenderDrawColor (renderer , 0, 50, 50, 255);
-                    SDL_RenderFillRect(renderer, &cell_rect);
+                    SDL_SetRenderDrawColor (renderer , 0, 255, 0, 255);
+                    SDL_RenderCopy(renderer, texture, NULL, &cell_rect);
+                    //SDL_RenderFillRect(renderer, &cell_rect);
                 }
             }
         }
@@ -170,10 +157,10 @@ int main(int argc, char **argv)
 
 
     quit:
-        if(pixels)
+        /*if(pixels)
         {
             SDL_free(pixels);
-        }
+        }*/
         if(texture)
         {
             SDL_DestroyTexture(texture);
