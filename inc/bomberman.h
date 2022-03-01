@@ -32,6 +32,7 @@ int32_t move_on_level(level_t *level, movable_t *movable, const float delta_x, c
 
 typedef struct bomberman
 {
+    uint32_t id;
     movable_t movable;
     uint32_t number_of_bombs;
     uint32_t dropped_bomb;

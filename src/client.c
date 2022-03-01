@@ -52,7 +52,10 @@ int send_data(int player_id, float x, float y)
     packet_t packet = {player_id, x, y};
     char msg[12];
     memcpy(msg, &packet, 12);
-    sendto(s, msg, 12, 0, (struct sockaddr*)&sock, sizeof(sock));
+    int sent_bytes =sendto(s, msg, 12, 0, (struct sockaddr*)&sock, sizeof(sock));
+    char addr_as_string[64];
+    inet_ntop(AF_INET, &sock.sin_addr, addr_as_string, 64);
+    printf("sends %d bytes to %s \n", sent_bytes,addr_as_string);
     return 0;
 }
 
@@ -67,6 +70,8 @@ char* recive_data()
     {
         char msg[12];
         inet_ntop (AF_INET, &sender_in .sin_addr , msg , sizeof(packet_t));
+        printf("received %d bytes from %s:%d\n", len, msg, ntohs(sender_in.sin_port));
+
         return msg;
     }
     return NULL;

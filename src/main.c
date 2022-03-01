@@ -2,6 +2,7 @@
 #include "bomberman.h"
 #include "level001.h"
 #include "parse_bmp.h"
+#include "client.h"
 
 int main(int argc, char **argv)
 {
@@ -9,11 +10,21 @@ int main(int argc, char **argv)
     level_init(&level001, 8, 8, 64, level001_cells);
 
     bomberman_t player0;
+    player0.id = 0;
     player0.movable.x = 100;
     player0.movable.y = 100;
     player0.movable.width = 32;
     player0.movable.height = 32;
     player0.movable.speed = 48;
+
+    
+    bomberman_t player1;
+    player1.id = 1;
+    player1.movable.x = 300;
+    player1.movable.y = 300;
+    player1.movable.width = 32;
+    player1.movable.height = 32;
+    player1.movable.speed = 48;
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
     {
@@ -34,12 +45,7 @@ int main(int argc, char **argv)
         goto quit;
     }
 
-    SDL_Texture *texture = SDL_CreateTexture (renderer, SDL_PIXELFORMAT_RGBA32 , SDL_TEXTUREACCESS_STATIC , 128, 128);
-    if(!texture)
-    {
-        SDL_Log("Unable to create texture: %s", SDL_GetError());
-        goto quit;
-    }
+    SDL_Texture *texture ;
 
     /*unsigned int *pixels = SDL_malloc(128 * 128 * 4);
     if(!pixels)
@@ -56,8 +62,11 @@ int main(int argc, char **argv)
     SDL_SetTextureAlphaMod (texture, 255);
     SDL_SetTextureBlendMode (texture, SDL_BLENDMODE_BLEND );
 
+    init_socket();
+
     SDL_Rect cell_rect = {0, 0, level001.cell_size, level001.cell_size}; 
     SDL_Rect player0_rect = {0, 0, player0.movable.width, player0.movable.height}; 
+    SDL_Rect player1_rect = {0, 0, player1.movable.width, player1.movable.height}; 
 
     float delta_right = 0;
     float delta_left = 0;
@@ -151,6 +160,16 @@ int main(int argc, char **argv)
         player0_rect.y = player0.movable.y;
         SDL_SetRenderDrawColor (renderer , 255, 255, 255, 255);
         SDL_RenderFillRect(renderer, &player0_rect);
+
+        send_data(player0.id, player0.movable.x, player0.movable.y);
+
+        recive_data();
+
+        player1_rect.x = player1.movable.x;
+        player1_rect.y = player1.movable.y;
+
+        SDL_SetRenderDrawColor (renderer , 255, 0, 0, 255);
+        SDL_RenderFillRect(renderer, &player1_rect);
 
         SDL_RenderPresent (renderer);
     }
