@@ -14,7 +14,7 @@
 #pragma comment(lib,"WS2_32")
 
 #define IP "127.0.0.1"
-#define PORT 9999
+#define PORT 900
 
 int s;
 struct sockaddr_in sock;
@@ -40,10 +40,17 @@ int init_socket()
 
     printf("socket %d created\n", s);
 
-    struct sockaddr_in sin;
-    inet_pton(AF_INET, IP, &sock.sin_addr); // this will create a big entian 32 bit address
+    inet_pton(AF_INET, IP, &sock.sin_addr); // this will create a big endian 32 bit address
     sock.sin_family = AF_INET;
     sock.sin_port = htons(PORT); // converts 9999 to big endian
+
+    unsigned int timeout = 10;
+    if (setsockopt(s, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout, sizeof(unsigned int)))
+    {
+        printf("unable to set socket option for receive timeout");
+        return -1;
+    } 
+
     return 0;
 }
 
@@ -53,26 +60,28 @@ int send_data(int player_id, float x, float y)
     char msg[12];
     memcpy(msg, &packet, 12);
     int sent_bytes =sendto(s, msg, 12, 0, (struct sockaddr*)&sock, sizeof(sock));
-    char addr_as_string[64];
-    inet_ntop(AF_INET, &sock.sin_addr, addr_as_string, 64);
-    printf("sends %d bytes to %s \n", sent_bytes,addr_as_string);
+    //printf("sends %d bytes to %s \n", sent_bytes,addr_as_string);
     return 0;
 }
 
-char* recive_data()
+void recive_data(bomberman_t *player)
 {
     char buffer[8192];
     struct sockaddr_in sender_in;
     int sender_in_size = sizeof(sender_in);
 
     int len = recvfrom(s, buffer, 8192, 0, (struct sockaddr*)&sender_in, &sender_in_size);
+    printf("recived packet lenght %d \n", len);
     if(len > 0)
     {
-        char msg[12];
-        inet_ntop (AF_INET, &sender_in .sin_addr , msg , sizeof(packet_t));
-        printf("received %d bytes from %s:%d\n", len, msg, ntohs(sender_in.sin_port));
-
-        return msg;
+        packet_t packet;
+        memcpy(&packet, buffer, 12);
+        player->id = packet.auth;  
+        player->movable.x = packet.x;  
+        player->movable.y = packet.y;  
+        player->movable.width = 32;
+        player->movable.height = 32;
+        player->movable.speed = 48;
     }
-    return NULL;
+    return ;
 }

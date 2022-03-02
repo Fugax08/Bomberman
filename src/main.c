@@ -19,12 +19,6 @@ int main(int argc, char **argv)
 
     
     bomberman_t player1;
-    player1.id = 1;
-    player1.movable.x = 300;
-    player1.movable.y = 300;
-    player1.movable.width = 32;
-    player1.movable.height = 32;
-    player1.movable.speed = 48;
 
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) != 0)
     {
@@ -66,7 +60,7 @@ int main(int argc, char **argv)
 
     SDL_Rect cell_rect = {0, 0, level001.cell_size, level001.cell_size}; 
     SDL_Rect player0_rect = {0, 0, player0.movable.width, player0.movable.height}; 
-    SDL_Rect player1_rect = {0, 0, player1.movable.width, player1.movable.height}; 
+    SDL_Rect player1_rect = {0, 0, player0.movable.width, player0.movable.height}; 
 
     float delta_right = 0;
     float delta_left = 0;
@@ -163,7 +157,7 @@ int main(int argc, char **argv)
 
         send_data(player0.id, player0.movable.x, player0.movable.y);
 
-        recive_data();
+        recive_data(&player1);
 
         player1_rect.x = player1.movable.x;
         player1_rect.y = player1.movable.y;
